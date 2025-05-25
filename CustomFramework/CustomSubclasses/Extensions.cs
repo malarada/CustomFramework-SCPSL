@@ -1,13 +1,21 @@
 ﻿using CustomFramework.Enums;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
+using PlayerStatsSystem;
 using System.Reflection;
 
 namespace CustomFramework.CustomSubclasses
 {
     public static class Extensions
-    {
-        public static string GetTeam(this Player player)
+	{
+		public static void SetMaxStamina(this Player player, float value)
+		{
+			if (player == null) return;
+
+			player.GetStatModule<StaminaStat>().MaxValue = value;
+		}
+
+		public static string GetTeam(this Player player)
         {
             var subclass = CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[player]);
 
