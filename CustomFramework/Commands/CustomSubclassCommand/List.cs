@@ -1,13 +1,7 @@
 ﻿using CommandSystem;
 using CustomFramework.CustomSubclasses;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomFramework.Commands.CustomSubclassCommand
 {
@@ -23,9 +17,7 @@ namespace CustomFramework.Commands.CustomSubclassCommand
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player player = Player.Get(sender);
-
-            if (!player.CheckPermission(PlayerPermissions.ForceclassSelf) && !player.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
+            if (!sender.CheckPermission(PlayerPermissions.ForceclassSelf) && !sender.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
             {
                 response = "You do not have permission to use this command (Need permission: ForceclassSelf OR ForceclassWithoutResrictions)";
                 return false;

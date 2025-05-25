@@ -1,5 +1,5 @@
 ﻿using CustomFramework.Enums;
-using Exiled.API.Features;
+using LabApi.Features.Wrappers;
 using PlayerRoles;
 using System.Reflection;
 
@@ -9,7 +9,7 @@ namespace CustomFramework.CustomSubclasses
     {
         public static string GetTeam(this Player player)
         {
-            var subclass = CustomSubclass.Get(player.UniqueRole);
+            var subclass = CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[player]);
 
             if (subclass != null)
             {
@@ -18,51 +18,51 @@ namespace CustomFramework.CustomSubclasses
                 return attr?.Team;
             }
 
-            switch (player.Role.Type)
+            switch (player.RoleBase.RoleTypeId)
             {
-                case PlayerRoles.RoleTypeId.ClassD:
+                case RoleTypeId.ClassD:
                     return Teams.ClassD.ToString();
-                case PlayerRoles.RoleTypeId.Scientist:
+                case RoleTypeId.Scientist:
                     return Teams.Science.ToString();
-                case PlayerRoles.RoleTypeId.FacilityGuard:
+                case RoleTypeId.FacilityGuard:
                     return Teams.FacilityGuard.ToString();
-                case PlayerRoles.RoleTypeId.NtfPrivate:
+                case RoleTypeId.NtfPrivate:
                     return Teams.MTFPrivate.ToString();
-                case PlayerRoles.RoleTypeId.NtfSpecialist:
+                case RoleTypeId.NtfSpecialist:
                     return Teams.MTFSpecialist.ToString();
-                case PlayerRoles.RoleTypeId.NtfSergeant:
+                case RoleTypeId.NtfSergeant:
                     return Teams.MTFSergeant.ToString();
-                case PlayerRoles.RoleTypeId.NtfCaptain:
+                case RoleTypeId.NtfCaptain:
                     return Teams.MTFCaptain.ToString();
-                case PlayerRoles.RoleTypeId.ChaosConscript:
+                case RoleTypeId.ChaosConscript:
                     return Teams.CIConscript.ToString();
-                case PlayerRoles.RoleTypeId.ChaosRifleman:
+                case RoleTypeId.ChaosRifleman:
                     return Teams.CIRifleman.ToString();
-                case PlayerRoles.RoleTypeId.ChaosMarauder:
+                case RoleTypeId.ChaosMarauder:
                     return Teams.CIMarauder.ToString();
-                case PlayerRoles.RoleTypeId.ChaosRepressor:
+                case RoleTypeId.ChaosRepressor:
                     return Teams.CIRepressor.ToString();
-                case PlayerRoles.RoleTypeId.Scp049:
+                case RoleTypeId.Scp049:
                     return Teams.SCP049.ToString();
-                case PlayerRoles.RoleTypeId.Scp0492:
+                case RoleTypeId.Scp0492:
                     return Teams.SCP0492.ToString();
-                case PlayerRoles.RoleTypeId.Scp079:
+                case RoleTypeId.Scp079:
                     return Teams.SCP079.ToString();
-                case PlayerRoles.RoleTypeId.Scp096:
+                case RoleTypeId.Scp096:
                     return Teams.SCP096.ToString();
-                case PlayerRoles.RoleTypeId.Scp106:
+                case RoleTypeId.Scp106:
                     return Teams.SCP106.ToString();
-                case PlayerRoles.RoleTypeId.Scp173:
+                case RoleTypeId.Scp173:
                     return Teams.SCP173.ToString();
-                case PlayerRoles.RoleTypeId.Scp939:
+                case RoleTypeId.Scp939:
                     return Teams.SCP939.ToString();
-                case PlayerRoles.RoleTypeId.Scp3114:
+                case RoleTypeId.Scp3114:
                     return Teams.SCP3114.ToString();
-                case PlayerRoles.RoleTypeId.Flamingo:
+                case RoleTypeId.Flamingo:
                     return Teams.SCP1507.ToString();
-                case PlayerRoles.RoleTypeId.AlphaFlamingo:
+                case RoleTypeId.AlphaFlamingo:
                     return Teams.SCP1507Alpha.ToString();
-                case PlayerRoles.RoleTypeId.ZombieFlamingo:
+                case RoleTypeId.ZombieFlamingo:
                     return Teams.SCP1507Zombie.ToString();
                 default:
                     return Teams.None.ToString();

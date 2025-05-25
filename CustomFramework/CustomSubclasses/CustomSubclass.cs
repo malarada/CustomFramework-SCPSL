@@ -1,5 +1,5 @@
-﻿using Exiled.API.Features;
-using Exiled.API.Features.Roles;
+﻿using LabApi.Features.Console;
+using LabApi.Features.Wrappers;
 using PlayerRoles;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,28 +56,27 @@ namespace CustomFramework.CustomSubclasses
 
         public virtual void GiveSubclass(Player player, RoleSpawnFlags flags) //, bool setRole = false, bool useSpawnpoint = false, bool resetInventory = true)
         {
-            Log.Debug($"Giving {player.Nickname} {Identifier} subclass.");
+            LabApi.Features.Console.Logger.Debug($"Giving {player.Nickname} {Identifier} subclass.");
 
             TrackedPlayers.Add(player);
             player.CustomInfo = CustomInfo;
-            player.UniqueRole = Identifier;
-            PriorScale = player.Scale;
-            player.Scale = Vector3.Scale(player.Scale, Scale);
-            //player.Scale.Scale(Scale);
-            player.Broadcast(5, $"You are the {Name} {GetType().GetCustomAttribute<CustomSubclassAttribute>().Team}.\n{Description}");
+            CustomFrameworkPlugin.PlayerSubclasses[player] = Identifier;
+            PriorScale = player.ReferenceHub.transform.localScale;
+            player.ReferenceHub.transform.localScale = Vector3.Scale(player.ReferenceHub.transform.localScale, Scale);
+            player.SendBroadcast($"You are the {Name} {GetType().GetCustomAttribute<CustomSubclassAttribute>().Team}.\n{Description}", 5);
         }
 
         public virtual void RemoveSubclass(Player player)
         {
-            Log.Debug($"Removing from {player.Nickname} {Identifier} subclass.");
+			LabApi.Features.Console.Logger.Debug($"Removing from {player.Nickname} {Identifier} subclass.");
 
             if (player == null) return;
 
             if (TrackedPlayers.Contains(player))
                 TrackedPlayers.Remove(player);
             player.CustomInfo = "";
-            player.UniqueRole = "";
-            player.Scale = PriorScale;
+            CustomFrameworkPlugin.PlayerSubclasses[player] = "";
+            player.ReferenceHub.transform.localScale = PriorScale;
         }
 
         public virtual void Init()
@@ -92,17 +91,11 @@ namespace CustomFramework.CustomSubclasses
 
         internal bool TryRegister()
         {
-            if (!CustomFrameworkPlugin.Instance.Config.IsEnabled)
-            {
-                Log.Warn($"Couldn't register CustomFramework, CustomFramework is not enabled.");
-                return false;
-            }
-
             if (!Registered.Contains(this))
             {
                 if (Registered.Any(r => r.Identifier == Identifier))
                 {
-                    Log.Warn($"{Identifier} was already registered.");
+					LabApi.Features.Console.Logger.Warn($"{Identifier} was already registered.");
                     return false;
                 }
 
@@ -112,7 +105,7 @@ namespace CustomFramework.CustomSubclasses
                 return true;
             }
 
-            Log.Warn($"Couldn't register {Name} ({Identifier})");
+			LabApi.Features.Console.Logger.Warn($"Couldn't register {Name} ({Identifier})");
             return false;
         }
 

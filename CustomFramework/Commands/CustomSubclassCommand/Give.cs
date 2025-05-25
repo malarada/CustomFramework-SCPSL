@@ -1,7 +1,6 @@
 ﻿using CommandSystem;
 using CustomFramework.CustomSubclasses;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
+using LabApi.Features.Wrappers;
 using System;
 
 namespace CustomFramework.Commands.CustomSubclassCommand
@@ -34,23 +33,23 @@ namespace CustomFramework.Commands.CustomSubclassCommand
                 return false;
             }
 
-            var person = arguments.Count == 1 ? player.Id.ToString() : arguments.At(1);
+            var person = arguments.Count == 1 ? player.PlayerId.ToString() : arguments.At(1);
 
             if (int.TryParse(person, out var p))
             {
-                if (Player.Get(p) == player && !player.CheckPermission(PlayerPermissions.ForceclassSelf) && !player.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
+                if (Player.Get(p) == player && !sender.CheckPermission(PlayerPermissions.ForceclassSelf) && !sender.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
                 {
                     response = "Missing permission: requires ForceclassSelf OR ForceclassWithoutRestrictions.";
                     return false;
                 }
-                if (!player.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
+                if (!sender.CheckPermission(PlayerPermissions.ForceclassWithoutRestrictions))
                 {
                     response = "Missing permission: requires ForceclassWithoutRestrictions.";
                     return false;
                 }
 
-                if (Player.Get(p).UniqueRole != null && Player.Get(p).UniqueRole != "")
-                    CustomSubclass.Get(Player.Get(p).UniqueRole).RemoveSubclass(Player.Get(p));
+                if (CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)] != null && CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)] != "")
+                    CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)]).RemoveSubclass(Player.Get(p));
 
                 subclass.GiveSubclass(Player.Get(p));
                 response = "Subclass given to player.";
@@ -60,8 +59,8 @@ namespace CustomFramework.Commands.CustomSubclassCommand
             {
                 foreach (Player ply in Player.List)
                 {
-                    if (ply.UniqueRole != null && ply.UniqueRole != "")
-                        CustomSubclass.Get(ply.UniqueRole).RemoveSubclass(ply);
+                    if (CustomFrameworkPlugin.PlayerSubclasses[ply] != null && CustomFrameworkPlugin.PlayerSubclasses[ply] != "")
+                        CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[ply]).RemoveSubclass(ply);
                     subclass.GiveSubclass(ply);
                 }
                 response = "Subclass given to all players.";

@@ -1,7 +1,6 @@
 ﻿using CommandSystem;
 using CustomFramework.CustomSubclasses;
-using Exiled.API.Features;
-using Exiled.API.Features.Roles;
+using LabApi.Features.Wrappers;
 using System;
 
 namespace CustomFramework.Commands
@@ -22,16 +21,9 @@ namespace CustomFramework.Commands
             response = "";
 
             if (player.IsAlive)
-            {
-                role = CustomSubclass.Get(player.UniqueRole);
-            }
+                role = CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[player]);
             else
-            {
-                SpectatorRole spectator = player.Role as SpectatorRole;
-                Player spectated = spectator.SpectatedPlayer;
-
-                role = CustomSubclass.Get(spectated.UniqueRole);
-            }
+                role = CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[player.CurrentlySpectating]);
 
             if (role != null)
             {

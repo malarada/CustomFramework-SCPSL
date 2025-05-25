@@ -3,10 +3,10 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using PlayerRoles;
 using System.Collections.Generic;
-using System.Linq;
 using Handlers = Exiled.Events.Handlers;
 using MEC;
 using Exiled.Events.EventArgs.Server;
+using System.Linq;
 
 namespace Chaos_Agent
 {
@@ -19,6 +19,7 @@ namespace Chaos_Agent
 		public override string Info { get; set; } = "The goal of the Chaos Agent is to kill their target group before the end of the round. The target group may change.";
 		public override string CustomInfo { get; set; } = "Chaos Agent";
 		public Player ChaosAgent { get; set; } = null;
+		public CustomSubclass PreviousSubclass { get; set; } = null;
 		public CoroutineHandle coroutine { get; set; }
 
 		public override void SubscribeEvents()
@@ -26,6 +27,7 @@ namespace Chaos_Agent
 			base.SubscribeEvents();
 
 			Handlers.Player.Died += Died;
+			Handlers.Player.Handcuffing += Handcuffing;
 
 			Handlers.Server.EndingRound += RoundEnding;
 		}
@@ -35,8 +37,19 @@ namespace Chaos_Agent
 			base.UnsubscribeEvents();
 
 			Handlers.Player.Died -= Died;
+			Handlers.Player.Handcuffing -= Handcuffing;
 
 			Handlers.Server.EndingRound -= RoundEnding;
+		}
+
+		private void Handcuffing(HandcuffingEventArgs ev)
+		{
+			if (Check(ev.Target))
+			{
+				ev.IsAllowed = false;
+				ev.Player.EnableEffect(Exiled.API.Enums.EffectType.Slowness, 50, 2f);
+				ev.Player.EnableEffect(Exiled.API.Enums.EffectType.Concussed, 2f);
+			}
 		}
 
 		private void Died(DiedEventArgs ev)
@@ -50,12 +63,19 @@ namespace Chaos_Agent
 			}
 			else
 			{
+				ev.Player.Role.Set(RoleTypeId.Tutorial);
+				PreviousSubclass = Get(ev.Player.UniqueRole);
+				GiveSubclass(ev.Player);
+
 				ChaosAgent = ev.Player;
 			}
 		}
 
 		public override void GiveSubclass(Player player)
 		{
+			PreviousSubclass = Get(player.UniqueRole);
+			PreviousSubclass.RemoveSubclass(player);
+
 			base.GiveSubclass(player);
 
 			player.AddItem(ItemType.GunSCP127);
@@ -64,14 +84,28 @@ namespace Chaos_Agent
 			player.AddItem(ItemType.ArmorHeavy);
 			player.AddItem(ItemType.KeycardO5);
 			player.AddItem(ItemType.Radio);
-			player.AddItem(ItemType.AntiSCP207);
 			player.AddAmmo(Exiled.API.Enums.AmmoType.Nato556, 200);
 
-			player.MaxHealth = 250 * (Player.List.Count + Player.Get(Team.SCPs).Count());
+			player.MaxHealth = 3500;
 			player.Health = player.MaxHealth;
 
 			coroutine = Timing.RunCoroutine(Coroutine());
+
+			PreviousSubclass.GiveSubclass(player);
+
+			player.UniqueRole = Identifier;
 		}
+
+		public override void RemoveSubclass(Player player)
+		{
+			base.RemoveSubclass(player);
+
+			PreviousSubclass.RemoveSubclass(player);
+		}
+
+		public override string GetSpecificHint(Player player) => PreviousSubclass.GetSpecificHint(player);
+
+		public override void OnAbility(Player player) => PreviousSubclass.OnAbility(player);
 
 		private void RoundEnding(EndingRoundEventArgs ev)
 		{
@@ -110,7 +144,28 @@ namespace Chaos_Agent
 			//	RoleTypeId.Scp3114
 			//};
 
-
+			foreach (var item in new List<RoleTypeId>()
+			{
+				RoleTypeId.ClassD,
+				RoleTypeId.Scientist,
+				RoleTypeId.FacilityGuard,
+				RoleTypeId.NtfCaptain,
+				RoleTypeId.ChaosRepressor,
+				RoleTypeId.Scp049,
+				RoleTypeId.Scp0492,
+				RoleTypeId.Scp079,
+				RoleTypeId.Scp096,
+				RoleTypeId.Scp106,
+				RoleTypeId.Scp173,
+				RoleTypeId.Scp939,
+				RoleTypeId.Scp3114
+			})
+			{
+				if (Player.List.Any(t => t.Role == item))
+				{
+					CATargets.Add(item);
+				}
+			}
 		}
 
 		private string GetChaosAgentTarget()
