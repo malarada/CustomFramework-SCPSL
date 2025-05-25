@@ -99,12 +99,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CustomFramework\CustomFramework.csproj">
-      <Project>{2d0aed11-27c8-4e65-82c5-3f19963ef8d0}</Project>
-      <Name>CustomFramework</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
