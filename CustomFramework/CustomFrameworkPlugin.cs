@@ -8,7 +8,6 @@ using CustomFramework.Interfaces;
 using System.Linq;
 using LabApi.Loader.Features.Plugins;
 using LabApi.Features.Wrappers;
-using PlayerRoles.Spectating;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Features.Console;
@@ -75,7 +74,12 @@ namespace CustomFramework
             }
 
             if (subclass == null) return string.Empty;
-			return $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
+            string str = $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
+            foreach (var hint in CustomHintService.hints)
+			{
+                str += hint.Invoke(player);
+			}
+			return str;
         }
 
         public override void Enable()
