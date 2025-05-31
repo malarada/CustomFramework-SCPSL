@@ -73,8 +73,15 @@ namespace CustomFramework
                 subclass = CustomSubclass.Get(PlayerSubclasses[player.CurrentlySpectating]);
             }
 
-            if (subclass == null) return string.Empty;
-            string str = $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
+            string str;
+            if (subclass != null)
+            {
+                str = $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
+            }
+            else
+            {
+                str = string.Empty;
+            }
             foreach (var hint in CustomHintService.hints)
 			{
                 str += hint.Invoke(player);
@@ -90,7 +97,7 @@ namespace CustomFramework
 
 			ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[]
             {
-                new SSKeybindSetting(0, "Subclass Ability", UnityEngine.KeyCode.Y)
+                new SSKeybindSetting(0, "Subclass Ability", UnityEngine.KeyCode.Z)
             };
 
             Handlers.PlayerEvents.Spawned += Spawned;
@@ -116,12 +123,19 @@ namespace CustomFramework
         {
             if (setting.Label == "Subclass Ability")
             {
-                CustomSubclass.Get(PlayerSubclasses[Player.Get(sender)]).OnAbility(Player.Get(sender));
+                var player = Player.Get(sender);
+                var cs = CustomSubclass.Get(PlayerSubclasses[player]);
+                cs?.OnAbility(player);
             }
         }
 
         private void Spawned(PlayerSpawnedEventArgs ev)
         {
+            if (!PlayerSubclasses.TryGetValue(ev.Player, out _))
+            {
+                PlayerSubclasses.Add(ev.Player, null);
+            }
+
             if (PlayerSubclasses[ev.Player] != "" && PlayerSubclasses[ev.Player] != null)
             {
                 var subclass = CustomSubclass.Get(PlayerSubclasses[ev.Player]);

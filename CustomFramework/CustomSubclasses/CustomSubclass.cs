@@ -13,14 +13,14 @@ namespace CustomFramework.CustomSubclasses
     {
         public static List<CustomSubclass> Registered = new List<CustomSubclass>();
 
-        internal int Id { get; set; }
+        public abstract int Id { get; set; }
         public abstract string Identifier { get; set; }
         public abstract string Name { get; set; }
         public abstract float SpawnTickets { get; set; }
         public abstract string Description { get; set; }
         public abstract string Info { get; set; }
         public abstract string CustomInfo { get; set; }
-        public virtual VoiceChatChannel VoiceChatChannel { get; set; } = VoiceChatChannel.None;
+        //public virtual VoiceChatChannel VoiceChatChannel { get; set; } = VoiceChatChannel.None;
         public virtual Vector3 Scale { get; set; } = Vector3.one;
         public virtual bool IsEscapeRole { get; set; } = true;
 
@@ -30,31 +30,19 @@ namespace CustomFramework.CustomSubclasses
 
         public virtual bool SpawnConditionsMet() => true;
 
-        public virtual void SubscribeEvents()
-        {
-        }
+        public virtual void SubscribeEvents() { }
 
-        public virtual void UnsubscribeEvents()
-        {
-        }
+        public virtual void UnsubscribeEvents() { }
 
-        public virtual void OnAbility(Player player)
-        {
-        }
+        public virtual void OnAbility(Player player) { }
 
-        public virtual string GetSpecificHint(Player player)
-        {
-            return string.Empty;
-        }
+        public virtual string GetSpecificHint(Player player) => string.Empty;
 
         protected Vector3 PriorScale = Vector3.one;
 
-        public virtual void GiveSubclass(Player player)
-        {
-            GiveSubclass(player, RoleSpawnFlags.None);
-        }
+        public virtual void GiveSubclass(Player player) => GiveSubclass(player, RoleSpawnFlags.None);
 
-        public virtual void GiveSubclass(Player player, RoleSpawnFlags flags) //, bool setRole = false, bool useSpawnpoint = false, bool resetInventory = true)
+        public virtual void GiveSubclass(Player player, RoleSpawnFlags flags)
         {
             LabApi.Features.Console.Logger.Debug($"Giving {player.Nickname} {Identifier} subclass.");
 
@@ -79,15 +67,9 @@ namespace CustomFramework.CustomSubclasses
             player.ReferenceHub.transform.localScale = PriorScale;
         }
 
-        public virtual void Init()
-        {
-            SubscribeEvents();
-        }
+        public virtual void Init() => SubscribeEvents();
 
-        public virtual void Destroy()
-        {
-            UnsubscribeEvents();
-        }
+        public virtual void Destroy() => UnsubscribeEvents();
 
         internal bool TryRegister()
         {
@@ -99,7 +81,6 @@ namespace CustomFramework.CustomSubclasses
                     return false;
                 }
 
-                Id = Registered.Count;
                 Registered.Add(this);
                 Init();
                 return true;
