@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using UserSettings.ServerSpecific;
 using CustomFramework.CustomSubclasses;
@@ -16,22 +16,22 @@ using HarmonyLib;
 
 namespace CustomFramework
 {
-	public class CustomFrameworkPlugin : Plugin
+    public class CustomFrameworkPlugin : Plugin
     {
         internal static CustomFrameworkPlugin Instance;
-        internal static List<ICoroutineObject> coroutineRoles {  get; set; }
+        internal static List<ICoroutineObject> coroutineRoles { get; set; }
         public static Dictionary<Player, string> PlayerSubclasses { get; set; } = new Dictionary<Player, string>();
 
-		public static Random Random = new Random();
+        public static Random Random = new Random();
 
         public static Harmony Patcher = new Harmony("PyroCycloneProjects.CustomFramework");
 
         public CustomFrameworkPlugin()
         {
             Instance = this;
-		}
+        }
 
-		public CoroutineHandle coroutine { get; set; }
+        public CoroutineHandle coroutine { get; set; }
 
         public override string Name => "Custom Framework";
 
@@ -41,34 +41,42 @@ namespace CustomFramework
 
         public override Version Version => new Version(1, 0, 0);
 
-		public override Version RequiredApiVersion => new Version(1, 0, 0);
+        public override Version RequiredApiVersion => new Version(1, 0, 0);
 
-		public IEnumerator<float> Coroutine()
-		{
+        public IEnumerator<float> Coroutine()
+        {
             while (true)
             {
-                foreach (var player in Player.List)
+                try
                 {
-                    var hint = GetSubclassHint(player);
-                    if (hint != string.Empty)
-                        player.SendHint(hint);
-				}
+                    foreach (var player in Player.List)
+                    {
+                        var hint = GetSubclassHint(player);
+                        if (!string.IsNullOrEmpty(hint))
+                            player.SendHint(hint);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"[CustomFramework] Error in Coroutine: {ex}");
+                }
 
                 yield return Timing.WaitForSeconds(1f);
-			}
-		}
+            }
+        }
 
-		public static string GetSubclassHint(Player player)
+        public static string GetSubclassHint(Player player)
         {
             if (!Round.IsRoundInProgress || player == null) return string.Empty;
 
-            CustomSubclass subclass;
+            CustomSubclass subclass = null;
 
             if (player.IsAlive)
             {
-                subclass = CustomSubclass.Get(PlayerSubclasses[player]);
+                if (PlayerSubclasses.ContainsKey(player))
+                    subclass = CustomSubclass.Get(PlayerSubclasses[player]);
             }
-            else
+            else if (player.CurrentlySpectating != null && PlayerSubclasses.ContainsKey(player.CurrentlySpectating))
             {
                 subclass = CustomSubclass.Get(PlayerSubclasses[player.CurrentlySpectating]);
             }
@@ -83,10 +91,10 @@ namespace CustomFramework
                 str = string.Empty;
             }
             foreach (var hint in CustomHintService.hints)
-			{
+            {
                 str += hint.Invoke(player);
-			}
-			return str;
+            }
+            return str;
         }
 
         public override void Enable()
@@ -95,7 +103,7 @@ namespace CustomFramework
 
             coroutine = Timing.RunCoroutine(Coroutine());
 
-			ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[]
+            ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[]
             {
                 new SSKeybindSetting(0, "Subclass Ability", UnityEngine.KeyCode.Z)
             };
@@ -103,19 +111,17 @@ namespace CustomFramework
             Handlers.PlayerEvents.Spawned += Spawned;
             Handlers.ServerEvents.RoundStarted += RoundStarted;
             Handlers.ServerEvents.RoundEnded += RoundEnded;
-            //Handlers.Server.RespawningTeam += RespawningTeam;
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += SettingValueReceived;
         }
 
         public override void Disable()
         {
             if (coroutine.IsRunning)
-				Timing.KillCoroutines(coroutine);
+                Timing.KillCoroutines(coroutine);
 
-			Handlers.PlayerEvents.Spawned -= Spawned;
+            Handlers.PlayerEvents.Spawned -= Spawned;
             Handlers.ServerEvents.RoundStarted -= RoundStarted;
             Handlers.ServerEvents.RoundEnded -= RoundEnded;
-            //Handlers.Server.RespawningTeam -= RespawningTeam;
             ServerSpecificSettingsSync.ServerOnSettingValueReceived -= SettingValueReceived;
         }
 
@@ -124,8 +130,11 @@ namespace CustomFramework
             if (setting.Label == "Subclass Ability")
             {
                 var player = Player.Get(sender);
-                var cs = CustomSubclass.Get(PlayerSubclasses[player]);
-                cs?.OnAbility(player);
+                if (PlayerSubclasses.ContainsKey(player))
+                {
+                    var cs = CustomSubclass.Get(PlayerSubclasses[player]);
+                    cs?.OnAbility(player);
+                }
             }
         }
 
@@ -136,11 +145,11 @@ namespace CustomFramework
                 PlayerSubclasses.Add(ev.Player, null);
             }
 
-            if (PlayerSubclasses[ev.Player] != "" && PlayerSubclasses[ev.Player] != null)
+            if (!string.IsNullOrEmpty(PlayerSubclasses[ev.Player]))
             {
                 var subclass = CustomSubclass.Get(PlayerSubclasses[ev.Player]);
-
-                subclass.RemoveSubclass(ev.Player);
+                subclass?.RemoveSubclass(ev.Player);
+                PlayerSubclasses[ev.Player] = null;
             }
 
             List<CustomSubclass> roleList = CustomSubclass.Registered
@@ -148,7 +157,7 @@ namespace CustomFramework
                     t.GetType().GetCustomAttribute<CustomSubclassAttribute>()?.Team == ev.Player.GetTeam() &&
                     t.SpawnConditionsMet() &&
                     (
-						ev.Player.RoleBase.ServerSpawnReason != PlayerRoles.RoleChangeReason.Escaped ||
+                        ev.Player.RoleBase.ServerSpawnReason != PlayerRoles.RoleChangeReason.Escaped ||
                         t.IsEscapeRole
                     )
                 )
@@ -166,9 +175,11 @@ namespace CustomFramework
                     }
                 }
 
-                CustomSubclass chosenRole = weightedRoles[Random.Next(weightedRoles.Count)];
-
-                chosenRole.GiveSubclass(ev.Player);
+                if (weightedRoles.Count > 0)
+                {
+                    CustomSubclass chosenRole = weightedRoles[Random.Next(weightedRoles.Count)];
+                    chosenRole.GiveSubclass(ev.Player);
+                }
             }
         }
 
@@ -187,47 +198,53 @@ namespace CustomFramework
         private void RoundEnded(RoundEndedEventArgs ev)
         {
             foreach (var coroutineRole in coroutineRoles)
-                if (coroutineRole.coroutine != null)
-                    if (coroutineRole.coroutine.IsRunning)
-                        Timing.KillCoroutines(coroutineRole.coroutine);
+                if (coroutineRole.coroutine != null && coroutineRole.coroutine.IsRunning)
+                    Timing.KillCoroutines(coroutineRole.coroutine);
         }
 
         public static void RegisterAll()
         {
-            Logger.Debug("Registering all custom shit.");
+            Logger.Debug("Registering all custom subclasses.");
 
             Assembly assembly = Assembly.GetCallingAssembly();
 
             foreach (Type type in assembly.GetTypes())
             {
-                //if (typeof(CustomTeam).IsAssignableFrom(type))
-                //{
-                //    CustomTeam team = (CustomTeam)Activator.CreateInstance(type);
-                //    team?.TryRegister();
-                //}
                 if (typeof(CustomSubclass).IsAssignableFrom(type) && !type.IsAbstract)
                 {
-                    CustomSubclass subclass = (CustomSubclass)Activator.CreateInstance(type);
-                    Logger.Debug($"Attempting to register subclass {subclass.Identifier}");
-                    if (subclass.TryRegister())
+                    try
                     {
-                        Logger.Debug($"Registered subclass {subclass.Identifier}");
+                        CustomSubclass subclass = (CustomSubclass)Activator.CreateInstance(type);
+                        Logger.Debug($"Attempting to register subclass {subclass.Identifier}");
+                        if (subclass.TryRegister())
+                        {
+                            Logger.Debug($"Registered subclass {subclass.Identifier}");
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to instantiate subclass {type.FullName}: {ex}");
+                    }
+                }
+            }
+
+            // Set SpawnTickets to 0 for subclasses with "106" in their identifier
+            foreach (var subclass in CustomSubclass.Registered)
+            {
+                if (subclass.Identifier.Contains("106"))
+                {
+                    subclass.SpawnTickets = 0;
+                    Logger.Debug($"Set SpawnTickets to 0 for subclass {subclass.Identifier}");
                 }
             }
         }
 
         public static void UnregisterAll()
         {
-            //foreach (CustomTeam team in CustomTeam.Registered)
-            //{
-            //    team.TryUnregister();
-            //}
-
             foreach (CustomSubclass subclass in CustomSubclass.Registered)
             {
                 subclass.UnsubscribeEvents();
             }
         }
-	}
+    }
 }
