@@ -16,7 +16,7 @@ using HarmonyLib;
 
 namespace CustomFramework
 {
-    public class CustomFrameworkPlugin : Plugin
+    public class CustomFrameworkPlugin : Plugin<Config>
     {
         internal static CustomFrameworkPlugin Instance;
         internal static List<ICoroutineObject> coroutineRoles { get; set; }
@@ -227,16 +227,6 @@ namespace CustomFramework
                     }
                 }
             }
-
-            // Set SpawnTickets to 0 for subclasses with "106" in their identifier
-            foreach (var subclass in CustomSubclass.Registered)
-            {
-                if (subclass.Identifier.Contains("106"))
-                {
-                    subclass.SpawnTickets = 0;
-                    Logger.Debug($"Set SpawnTickets to 0 for subclass {subclass.Identifier}");
-                }
-            }
         }
 
         public static void UnregisterAll()
@@ -246,5 +236,10 @@ namespace CustomFramework
                 subclass.UnsubscribeEvents();
             }
         }
+    }
+
+    public class Config
+    {
+        public bool Debug { get; set; } = false;
     }
 }
