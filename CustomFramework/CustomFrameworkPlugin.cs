@@ -31,8 +31,6 @@ namespace CustomFramework
             Instance = this;
         }
 
-        public CoroutineHandle coroutine { get; set; }
-
         public override string Name => "Custom Framework";
 
         public override string Description => "A minimalist framework used to give more power to developers.";
@@ -43,22 +41,32 @@ namespace CustomFramework
 
         public override Version RequiredApiVersion => new Version(1, 0, 0);
 
+        public CoroutineHandle coroutine { get; set; }
         public IEnumerator<float> Coroutine()
         {
-            while (true)
+            if (Config.Debug)
+				Logger.Debug("CustomHintService coroutine started.");
+
+			while (true)
             {
                 try
                 {
                     foreach (var player in Player.List)
                     {
                         var hint = GetSubclassHint(player);
+                        foreach (var h in CustomHintService.hints)
+                        {
+                            var n = h.Invoke(player);
+							if (!string.IsNullOrEmpty(n))
+                                hint += n;
+						}
                         if (!string.IsNullOrEmpty(hint))
                             player.SendHint(hint);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"[CustomFramework] Error in Coroutine: {ex}");
+                    Logger.Error($"[CustomFramework] Error in CustomHintService coroutine: {ex}");
                 }
 
                 yield return Timing.WaitForSeconds(1f);
@@ -81,20 +89,9 @@ namespace CustomFramework
                 subclass = CustomSubclass.Get(PlayerSubclasses[player.CurrentlySpectating]);
             }
 
-            string str;
             if (subclass != null)
-            {
-                str = $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
-            }
-            else
-            {
-                str = string.Empty;
-            }
-            foreach (var hint in CustomHintService.hints)
-            {
-                str += hint.Invoke(player);
-            }
-            return str;
+                return $"<align=left><size=20>{subclass?.Name}\nUse .roleinfo for information\nabout this role.</size></align><align=right>{subclass?.GetSpecificHint(player)}</align>";
+            return string.Empty;
         }
 
         public override void Enable()
