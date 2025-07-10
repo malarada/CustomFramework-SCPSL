@@ -38,25 +38,25 @@ namespace CustomFramework.CustomSubclasses
 
         public virtual string GetSpecificHint(Player player) => string.Empty;
 
-        protected Vector3 PriorScale = Vector3.one;
+        //protected Vector3 PriorScale = Vector3.one;
 
-        public virtual void GiveSubclass(Player player) => GiveSubclass(player, RoleSpawnFlags.None);
+        public virtual void GiveSubclass(Player player) => GiveSubclass(player, true);
 
-        public virtual void GiveSubclass(Player player, RoleSpawnFlags flags)
+        public virtual void GiveSubclass(Player player, bool setRole)
         {
             LabApi.Features.Console.Logger.Debug($"Giving {player.Nickname} {Identifier} subclass.");
 
             TrackedPlayers.Add(player);
             player.CustomInfo = CustomInfo;
             CustomFrameworkPlugin.PlayerSubclasses[player] = Identifier;
-            PriorScale = player.ReferenceHub.transform.localScale;
+            //PriorScale = player.ReferenceHub.transform.localScale;
             player.ReferenceHub.transform.localScale = Vector3.Scale(player.ReferenceHub.transform.localScale, Scale);
             player.SendBroadcast($"You are the {Name} {GetType().GetCustomAttribute<CustomSubclassAttribute>().Team}.\n{Description}", 5);
         }
 
         public virtual void RemoveSubclass(Player player)
         {
-			LabApi.Features.Console.Logger.Debug($"Removing from {player.Nickname} {Identifier} subclass.");
+			LabApi.Features.Console.Logger.Debug($"Removing {Identifier} subclass from {player.Nickname}.");
 
             if (player == null) return;
 
@@ -64,7 +64,7 @@ namespace CustomFramework.CustomSubclasses
                 TrackedPlayers.Remove(player);
             player.CustomInfo = "";
             CustomFrameworkPlugin.PlayerSubclasses[player] = "";
-            player.ReferenceHub.transform.localScale = PriorScale;
+            player.ReferenceHub.transform.localScale = Vector3.one;
         }
 
         public virtual void Init() => SubscribeEvents();

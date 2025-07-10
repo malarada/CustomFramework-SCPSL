@@ -100,23 +100,23 @@ namespace CustomFramework
 
             coroutine = Timing.RunCoroutine(Coroutine());
 
+            Handlers.PlayerEvents.ChangedRole += Spawned;
+            Handlers.ServerEvents.RoundStarted += RoundStarted;
+            Handlers.ServerEvents.RoundEnded += RoundEnded;
+
             ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[]
             {
                 new SSKeybindSetting(0, "Subclass Ability", UnityEngine.KeyCode.Z)
             };
-
-            Handlers.PlayerEvents.Spawned += Spawned;
-            Handlers.ServerEvents.RoundStarted += RoundStarted;
-            Handlers.ServerEvents.RoundEnded += RoundEnded;
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += SettingValueReceived;
         }
 
-        public override void Disable()
+		public override void Disable()
         {
             if (coroutine.IsRunning)
                 Timing.KillCoroutines(coroutine);
 
-            Handlers.PlayerEvents.Spawned -= Spawned;
+            Handlers.PlayerEvents.ChangedRole -= Spawned;
             Handlers.ServerEvents.RoundStarted -= RoundStarted;
             Handlers.ServerEvents.RoundEnded -= RoundEnded;
             ServerSpecificSettingsSync.ServerOnSettingValueReceived -= SettingValueReceived;
@@ -135,7 +135,7 @@ namespace CustomFramework
             }
         }
 
-        private void Spawned(PlayerSpawnedEventArgs ev)
+        private void Spawned(PlayerChangedRoleEventArgs ev)
         {
             if (!PlayerSubclasses.TryGetValue(ev.Player, out _))
             {
@@ -177,6 +177,12 @@ namespace CustomFramework
                     CustomSubclass chosenRole = weightedRoles[Random.Next(weightedRoles.Count)];
                     chosenRole.GiveSubclass(ev.Player);
                 }
+
+                Logger.Debug("Finished player spawned on Framework");
+            }
+            else
+            {
+                Logger.Debug($"No subclasses found for team: {ev.Player.GetTeam()}");
             }
         }
 
