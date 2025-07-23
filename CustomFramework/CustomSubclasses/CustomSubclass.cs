@@ -1,4 +1,5 @@
-﻿using LabApi.Features.Console;
+﻿using CustomFramework.Features;
+using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace CustomFramework.CustomSubclasses
 {
     public abstract class CustomSubclass
     {
-        public static List<CustomSubclass> Registered = new List<CustomSubclass>();
+        public static HashSet<CustomSubclass> Registered = new HashSet<CustomSubclass>();
 
         public abstract int Id { get; set; }
         public abstract string Identifier { get; set; }
@@ -30,10 +31,8 @@ namespace CustomFramework.CustomSubclasses
 
         public virtual bool SpawnConditionsMet() => true;
 
-        public virtual void SubscribeEvents() { }
-
+		public virtual void SubscribeEvents() { }
         public virtual void UnsubscribeEvents() { }
-
         public virtual void OnAbility(Player player) { }
 
         public virtual string GetSpecificHint(Player player) => string.Empty;
@@ -50,7 +49,8 @@ namespace CustomFramework.CustomSubclasses
             player.CustomInfo = CustomInfo;
             CustomFrameworkPlugin.PlayerSubclasses[player] = Identifier;
             //PriorScale = player.ReferenceHub.transform.localScale;
-            player.ReferenceHub.transform.localScale = Vector3.Scale(player.ReferenceHub.transform.localScale, Scale);
+            //player.ReferenceHub.transform.localScale = Vector3.Scale(player.ReferenceHub.transform.localScale, Scale);
+            player.SetScale(Scale);
             player.SendBroadcast($"You are the {Name} {GetType().GetCustomAttribute<CustomSubclassAttribute>().Team}.\n{Description}", 5);
         }
 

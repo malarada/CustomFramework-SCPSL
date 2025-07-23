@@ -1,5 +1,6 @@
 ﻿using CommandSystem;
 using CustomFramework.CustomSubclasses;
+using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
 using System;
 
@@ -19,18 +20,16 @@ namespace CustomFramework.Commands.CustomSubclassCommand
         {
             Player player = Player.Get(sender);
 
-            if (arguments.Count <= 1)
+            if (arguments.Count < 1)
             {
                 response = "give <SubclassId> [PlayerId|*]";
                 return false;
             }
 
-            int p;
+            int p = player.PlayerId;
 
-            if (arguments.Count >= 2)
-                _ = int.TryParse(arguments.At(1), out p);
-            else
-                p = player.PlayerId;
+            if (arguments.Count >= 2 && !int.TryParse(arguments.At(1), out p) && arguments.At(1) == "*")
+                    p = -1;
 
             CustomSubclass subclass = CustomSubclass.Get(int.Parse(arguments.At(0)));
 
@@ -40,7 +39,7 @@ namespace CustomFramework.Commands.CustomSubclassCommand
                 return false;
             }
 
-            if (arguments.At(1) == "*")
+            if (p == -1)
             {
                 foreach (Player ply in Player.List)
                 {

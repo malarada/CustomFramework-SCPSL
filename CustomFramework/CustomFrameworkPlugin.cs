@@ -13,6 +13,7 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Features.Console;
 using Handlers = LabApi.Events.Handlers;
 using HarmonyLib;
+using CustomFramework.CustomItems;
 
 namespace CustomFramework
 {
@@ -51,7 +52,7 @@ namespace CustomFramework
             {
                 try
                 {
-                    foreach (var player in Player.List)
+                    foreach (var player in Player.List.ToList())
                     {
                         var hint = GetSubclassHint(player);
                         foreach (var h in CustomHintService.hints)
@@ -60,6 +61,12 @@ namespace CustomFramework
 							if (!string.IsNullOrEmpty(n))
                                 hint += n;
 						}
+                        foreach (var h in CustomHintService.timedHints.ToList())
+                        {
+                            if (player != h.player) continue;
+                            if ((DateTime.UtcNow - h.startTime).TotalSeconds >= h.seconds) CustomHintService.timedHints.Remove(h);
+                            else hint += h.hint;
+                        }
                         if (!string.IsNullOrEmpty(hint))
                             player.SendHint(hint);
                     }
@@ -100,9 +107,11 @@ namespace CustomFramework
 
             coroutine = Timing.RunCoroutine(Coroutine());
 
+			Handlers.PlayerEvents.Joined += PlayerEvents_Joined;
             Handlers.PlayerEvents.ChangedRole += Spawned;
             Handlers.ServerEvents.RoundStarted += RoundStarted;
             Handlers.ServerEvents.RoundEnded += RoundEnded;
+			Handlers.ServerEvents.MapGenerated += ServerEvents_MapGenerated;
 
             ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[]
             {
@@ -111,16 +120,28 @@ namespace CustomFramework
             ServerSpecificSettingsSync.ServerOnSettingValueReceived += SettingValueReceived;
         }
 
+		private void PlayerEvents_Joined(PlayerJoinedEventArgs ev)
+		{
+            ServerSpecificSettingsSync.SendToPlayer(ev.Player.ReferenceHub);
+		}
+
 		public override void Disable()
         {
             if (coroutine.IsRunning)
                 Timing.KillCoroutines(coroutine);
 
+            Handlers.PlayerEvents.Joined -= PlayerEvents_Joined;
             Handlers.PlayerEvents.ChangedRole -= Spawned;
             Handlers.ServerEvents.RoundStarted -= RoundStarted;
             Handlers.ServerEvents.RoundEnded -= RoundEnded;
+            Handlers.ServerEvents.MapGenerated -= ServerEvents_MapGenerated;
             ServerSpecificSettingsSync.ServerOnSettingValueReceived -= SettingValueReceived;
         }
+
+		private void ServerEvents_MapGenerated(MapGeneratedEventArgs ev)
+		{
+            
+		}
 
         private void SettingValueReceived(ReferenceHub sender, ServerSpecificSettingBase setting)
         {
@@ -152,7 +173,7 @@ namespace CustomFramework
             List<CustomSubclass> roleList = CustomSubclass.Registered
                 .Where(t =>
                     t.GetType().GetCustomAttribute<CustomSubclassAttribute>()?.Team == ev.Player.GetTeam() &&
-                    t.SpawnConditionsMet() &&
+                    t.SpawnProperties.SpawnConditionsMet &&
                     (
                         ev.Player.RoleBase.ServerSpawnReason != PlayerRoles.RoleChangeReason.Escaped ||
                         t.IsEscapeRole
@@ -213,31 +234,45 @@ namespace CustomFramework
 
             foreach (Type type in assembly.GetTypes())
             {
-                if (typeof(CustomSubclass).IsAssignableFrom(type) && !type.IsAbstract)
+                if (type.IsAbstract) continue;
+                else if (typeof(CustomSubclass).IsAssignableFrom(type))
                 {
                     try
                     {
                         CustomSubclass subclass = (CustomSubclass)Activator.CreateInstance(type);
                         Logger.Debug($"Attempting to register subclass {subclass.Identifier}");
-                        if (subclass.TryRegister())
-                        {
-                            Logger.Debug($"Registered subclass {subclass.Identifier}");
-                        }
+                        if (!subclass.TryRegister())
+                            Logger.Debug($"Could not register subclass {subclass.Identifier}");
                     }
                     catch (Exception ex)
                     {
                         Logger.Error($"Failed to instantiate subclass {type.FullName}: {ex}");
                     }
                 }
+                else if (typeof(CustomItem).IsAssignableFrom(type))
+                {
+                    try
+                    {
+                        CustomItem item = (CustomItem)Activator.CreateInstance(type);
+                        Logger.Debug($"Attempting to register custom item {item.Identifier}");
+                        if (!item.TryRegister())
+                            Logger.Debug($"Could not register custom item {item.Identifier}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to instantiate custom item {type.FullName}: {ex}");
+                    }
+                }
             }
+
+            CustomSubclass.Registered = CustomSubclass.Registered.OrderBy(t => t.Id).ToHashSet();
+            CustomItem.Registered = CustomItem.Registered.OrderBy(t => t.Id).ToHashSet();
         }
 
         public static void UnregisterAll()
         {
-            foreach (CustomSubclass subclass in CustomSubclass.Registered)
-            {
-                subclass.UnsubscribeEvents();
-            }
+            foreach (CustomSubclass subclass in CustomSubclass.Registered) subclass.TryUnregister();
+            foreach (CustomItem item in CustomItem.Registered) item.TryUnregister();
         }
     }
 
