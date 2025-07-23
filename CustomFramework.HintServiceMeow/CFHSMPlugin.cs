@@ -16,7 +16,7 @@ namespace CustomFramework.HintServiceMeow
 
 		public override string Author => "Pyro Cyclone Projects";
 
-		public override Version Version => new(1, 0, 0);
+		public override Version Version => new(2, 0, 0);
 
 		public override Version RequiredApiVersion => new(1, 1, 0);
 
