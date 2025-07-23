@@ -19,7 +19,7 @@ namespace CustomFramework
 {
     public class CustomFrameworkPlugin : Plugin<Config>
     {
-        internal static CustomFrameworkPlugin Instance;
+        public static CustomFrameworkPlugin Instance;
         internal static List<ICoroutineObject> coroutineRoles { get; set; }
         public static Dictionary<Player, string> PlayerSubclasses { get; set; } = new Dictionary<Player, string>();
 
@@ -54,20 +54,8 @@ namespace CustomFramework
                 {
                     foreach (var player in Player.List.ToList())
                     {
-                        var hint = GetSubclassHint(player);
-                        foreach (var h in CustomHintService.hints)
-                        {
-                            var n = h.Invoke(player);
-							if (!string.IsNullOrEmpty(n))
-                                hint += n;
-						}
-                        foreach (var h in CustomHintService.timedHints.ToList())
-                        {
-                            if (player != h.player) continue;
-                            if ((DateTime.UtcNow - h.startTime).TotalSeconds >= h.seconds) CustomHintService.timedHints.Remove(h);
-                            else hint += h.hint;
-                        }
-                        if (!string.IsNullOrEmpty(hint))
+                        var hint = GetPlayerHint(player);
+						if (!string.IsNullOrEmpty(hint))
                             player.SendHint(hint);
                     }
                 }
@@ -79,6 +67,24 @@ namespace CustomFramework
                 yield return Timing.WaitForSeconds(1f);
             }
         }
+
+        public string GetPlayerHint(Player player)
+        {
+			var hint = GetSubclassHint(player);
+			foreach (var h in CustomHintService.hints)
+			{
+				var n = h.Invoke(player);
+				if (!string.IsNullOrEmpty(n))
+					hint += n;
+			}
+			foreach (var h in CustomHintService.timedHints.ToList())
+			{
+				if (player != h.player) continue;
+				if ((DateTime.UtcNow - h.startTime).TotalSeconds >= h.seconds) CustomHintService.timedHints.Remove(h);
+				else hint += h.hint;
+			}
+            return hint;
+		}
 
         public static string GetSubclassHint(Player player)
         {
@@ -173,7 +179,7 @@ namespace CustomFramework
             List<CustomSubclass> roleList = CustomSubclass.Registered
                 .Where(t =>
                     t.GetType().GetCustomAttribute<CustomSubclassAttribute>()?.Team == ev.Player.GetTeam() &&
-                    t.SpawnProperties.SpawnConditionsMet &&
+                    t.SpawnConditionsMet() &&
                     (
                         ev.Player.RoleBase.ServerSpawnReason != PlayerRoles.RoleChangeReason.Escaped ||
                         t.IsEscapeRole

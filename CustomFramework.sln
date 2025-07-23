@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos Agent", "Chaos Agent\Chaos Agent.csproj", "{D40B741D-01A3-45FA-886D-579CBBAB490F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F412482B-C5E5-418D-ACD4-8B3AC1A4EB05}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
@@ -12,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFramework", "CustomFramework\CustomFramework.csproj", "{2C012EA2-CB56-45A9-880F-84B59AA08D39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomInformation", "CustomInformation\CustomInformation.csproj", "{5FB7A492-0EC9-4F47-BF7A-D921540C7AE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFramework.HintServiceMeow", "CustomFramework.HintServiceMeow\CustomFramework.HintServiceMeow.csproj", "{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +18,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D40B741D-01A3-45FA-886D-579CBBAB490F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D40B741D-01A3-45FA-886D-579CBBAB490F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D40B741D-01A3-45FA-886D-579CBBAB490F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D40B741D-01A3-45FA-886D-579CBBAB490F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C012EA2-CB56-45A9-880F-84B59AA08D39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C012EA2-CB56-45A9-880F-84B59AA08D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C012EA2-CB56-45A9-880F-84B59AA08D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C012EA2-CB56-45A9-880F-84B59AA08D39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FB7A492-0EC9-4F47-BF7A-D921540C7AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FB7A492-0EC9-4F47-BF7A-D921540C7AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FB7A492-0EC9-4F47-BF7A-D921540C7AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FB7A492-0EC9-4F47-BF7A-D921540C7AE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -38,12 +38,14 @@ namespace CustomFramework.CustomItems
 		
 		private void PlayerEvents_ChangedItem(LabApi.Events.Arguments.PlayerEvents.PlayerChangedItemEventArgs ev)
 		{
-			CustomHintService.AddTimedHint($"Switched to {Name}\n", 3, ev.Player);
+			if (Check(ev.NewItem))
+				CustomHintService.AddTimedHint($"Switched to {Name}\n", 3, ev.Player);
 		}
 		
 		private void PlayerEvents_PickedUpItem(LabApi.Events.Arguments.PlayerEvents.PlayerPickedUpItemEventArgs ev)
 		{
-			CustomHintService.AddTimedHint($"Picked up {Name}\n", 3, ev.Player);
+			if (Check(ev.Item))
+				CustomHintService.AddTimedHint($"Picked up {Name}\n", 3, ev.Player);
 		}
 
 		public virtual bool Check(Item item) => item != null && TrackedSerials.Contains(item.Serial);

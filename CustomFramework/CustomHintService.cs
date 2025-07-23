@@ -1,6 +1,5 @@
 ﻿using LabApi.Features.Wrappers;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace CustomFramework
@@ -22,5 +21,12 @@ namespace CustomFramework
 		{
 			timedHints.Add((hint, seconds, DateTime.UtcNow, player));
 		}
+
+		//public enum HintAlignment
+		//{
+		//	Left,
+		//	Center,
+		//	Right
+		//}
 	}
 }
