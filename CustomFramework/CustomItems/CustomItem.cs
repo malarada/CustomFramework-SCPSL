@@ -55,7 +55,9 @@ namespace CustomFramework.CustomItems
 		public virtual Pickup Spawn(Vector3 position, ItemType item)
 		{
 			var pickup = Pickup.Create(item, position);
+			pickup.Spawn();
 			TrackedSerials.Add(pickup.Serial);
+			LabApi.Features.Console.Logger.Debug("Spawned object.");
 			return pickup;
 		}
 
