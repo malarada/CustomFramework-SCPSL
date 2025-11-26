@@ -19,6 +19,7 @@ namespace CustomFramework.Commands.CustomSubclassCommand
         {
             RegisterCommand(List.Instance);
             RegisterCommand(Give.Instance);
+            RegisterCommand(Disable.Instance);
         }
 
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)

@@ -28,10 +28,19 @@ namespace CustomFramework.Commands.CustomSubclassCommand
 
             int p = player.PlayerId;
 
-            if (arguments.Count >= 2 && !int.TryParse(arguments.At(1), out p) && arguments.At(1) == "*")
-                    p = -1;
+			if (arguments.Count >= 2)
+			{
+				string arg = arguments.At(1);
+				if (arg == "*")
+					p = -1;
+				else if (!int.TryParse(arg, out p))
+				{
+					// If second arg isn't a player ID, treat it as spawn flag instead
+					p = player.PlayerId;
+				}
+			}
 
-            CustomSubclass subclass = CustomSubclass.Get(int.Parse(arguments.At(0)));
+			CustomSubclass subclass = CustomSubclass.Get(int.Parse(arguments.At(0)));
 
             if (subclass == null)
             {
@@ -69,10 +78,10 @@ namespace CustomFramework.Commands.CustomSubclassCommand
                 if (CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)] != null && CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)] != "")
                     CustomSubclass.Get(CustomFrameworkPlugin.PlayerSubclasses[Player.Get(p)]).RemoveSubclass(Player.Get(p));
 
-                if (arguments.Count == 2)
-                    subclass.GiveSubclass(Player.Get(p), arguments.At(1) == "true");
-                else if (arguments.Count == 3)
+                if (arguments.Count >= 3)
                     subclass.GiveSubclass(Player.Get(p), arguments.At(2) == "true");
+                else if (arguments.Count == 2)
+                    subclass.GiveSubclass(Player.Get(p), arguments.At(1) == "true");
                 else
                     subclass.GiveSubclass(Player.Get(p), false);
                 response = "Subclass given to player.";

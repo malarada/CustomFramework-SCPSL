@@ -14,6 +14,7 @@ namespace CustomFramework.CustomItems
 		public abstract string Identifier { get; set; }
 		public abstract string Name { get; set; }
 		public abstract string Description { get; set; }
+		public abstract ItemType DefaultBaseItem { get; set; }
 
 		public HashSet<int> TrackedSerials { get; } = new HashSet<int>();
 
@@ -32,6 +33,7 @@ namespace CustomFramework.CustomItems
 		private void Destroy()
 		{
 			UnsubcribeEvents();
+			Registered.Clear();
 			Handlers.PlayerEvents.PickedUpItem -= PlayerEvents_PickedUpItem;
 			Handlers.PlayerEvents.ChangedItem -= PlayerEvents_ChangedItem;
 		}
@@ -61,9 +63,10 @@ namespace CustomFramework.CustomItems
 			return pickup;
 		}
 
-		public virtual void Give(Player player, ItemType item)
+		public virtual void Give(Player player, ItemType? item = null)
 		{
-			var i = player.AddItem(item);
+			if (item == null) item = DefaultBaseItem;
+			var i = player.AddItem((ItemType)item);
 			if (!TrackedSerials.Contains(i.Serial))
 				TrackedSerials.Add(i.Serial);
 			CustomHintService.AddTimedHint($"Picked up {Name}", 3, player);

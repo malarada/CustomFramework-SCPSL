@@ -27,9 +27,9 @@ namespace CustomFramework.Commands.CustomSubclassCommand
 
             foreach (var role in CustomSubclass.Registered)
             {
-                var roleAttr = role.GetType().GetCustomAttribute<CustomSubclassAttribute>();
-                if (roleAttr != null)
-                    response += $"\n[Id: {role.Id}, Identifier: {role.Identifier}, Team: {roleAttr.Team}";
+                var roleAttr = role.GetType().GetCustomAttributes<CustomSubclassAttribute>();
+                if (!roleAttr.IsEmpty())
+                    response += $"\n[Id: {role.Id}, Identifier: {role.Identifier}";
             }
 
             return true;

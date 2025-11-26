@@ -14,6 +14,8 @@ namespace CustomFramework.CustomSubclasses
     {
         public static HashSet<CustomSubclass> Registered = new HashSet<CustomSubclass>();
 
+        public static HashSet<CustomSubclass> Disabled = new HashSet<CustomSubclass>();
+
         public abstract int Id { get; set; }
         public abstract string Identifier { get; set; }
         public abstract string Name { get; set; }
@@ -28,8 +30,8 @@ namespace CustomFramework.CustomSubclasses
         public List<Player> TrackedPlayers { get; set; } = new List<Player>();
 
         public virtual bool Check(Player player) => TrackedPlayers.Contains(player);
-
-        public virtual bool SpawnConditionsMet() => true;
+        
+        public virtual bool SpawnConditionsMet(Player player) => true;
 
 		public virtual void SubscribeEvents() { }
         public virtual void UnsubscribeEvents() { }
@@ -38,8 +40,6 @@ namespace CustomFramework.CustomSubclasses
         public virtual string GetSpecificHint(Player player) => string.Empty;
 
         //protected Vector3 PriorScale = Vector3.one;
-
-        public virtual void GiveSubclass(Player player) => GiveSubclass(player, true);
 
         public virtual void GiveSubclass(Player player, bool setRole)
         {
@@ -51,8 +51,11 @@ namespace CustomFramework.CustomSubclasses
             //PriorScale = player.ReferenceHub.transform.localScale;
             //player.ReferenceHub.transform.localScale = Vector3.Scale(player.ReferenceHub.transform.localScale, Scale);
             player.SetScale(Scale);
-            player.SendBroadcast($"You are the {Name} {GetType().GetCustomAttribute<CustomSubclassAttribute>().Team}.\n{Description}", 5);
-        }
+            player.SendBroadcast($"You are the {Name}.\n{Description}", 5);
+
+    //        if (setRole)
+				//player.SetRole(GetType().GetCustomAttribute<CustomSubclassAttribute>().Team);
+		}
 
         public virtual void RemoveSubclass(Player player)
         {
@@ -69,13 +72,17 @@ namespace CustomFramework.CustomSubclasses
 
         public virtual void Init() => SubscribeEvents();
 
-        public virtual void Destroy() => UnsubscribeEvents();
+        public virtual void Destroy()
+        {
+            UnsubscribeEvents();
+            Registered.Clear();
+        }
 
         internal bool TryRegister()
         {
             if (!Registered.Contains(this))
             {
-                if (Registered.Any(r => r.Identifier == Identifier))
+                if (Registered.Any(r => r.Identifier == Identifier || r.Id == Id))
                 {
 					LabApi.Features.Console.Logger.Warn($"{Identifier} was already registered.");
                     return false;

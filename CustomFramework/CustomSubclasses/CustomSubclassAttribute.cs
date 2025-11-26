@@ -1,19 +1,22 @@
 ﻿using CustomFramework.Enums;
+using PlayerRoles;
 
 namespace CustomFramework.CustomSubclasses
 {
-    [System.AttributeUsage(System.AttributeTargets.Class)]
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
     public class CustomSubclassAttribute : System.Attribute
     {
-        public string Team { get; set; }
+        public RoleTypeId? Team { get; set; } = null;
+        public string TeamString { get; set; }
 
-        public CustomSubclassAttribute(Teams team) : this(team.ToString())
+        public CustomSubclassAttribute(RoleTypeId team) : this(team.ToString())
         {
+            Team = team;
         }
 
         public CustomSubclassAttribute(string team)
         {
-            Team = team;
+            TeamString = team;
         }
     }
 }

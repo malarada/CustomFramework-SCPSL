@@ -10,7 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFramework", "CustomFramework\CustomFramework.csproj", "{2C012EA2-CB56-45A9-880F-84B59AA08D39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFramework.HintServiceMeow", "CustomFramework.HintServiceMeow\CustomFramework.HintServiceMeow.csproj", "{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFramework.HintServiceMeow", "CustomFramework.HintServiceMeow\CustomFramework.HintServiceMeow.csproj", "{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFramework.ReuI", "CustomFramework.ReuI\CustomFramework.ReuI.csproj", "{D0879EED-D71E-49FE-BAFA-E1D7F50C573A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperPowerAPI", "..\Super Candy\SuperPowerAPI\SuperPowerAPI.csproj", "{2D0CD40B-A9D9-4755-BEB5-6369CAACAC27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFramework.SuperPowerAPI", "CustomFramework.SuperPowerAPI\CustomFramework.SuperPowerAPI.csproj", "{5AE5F914-8106-4E21-8CA3-61E3C92EDFF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +32,18 @@ Global
 		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A8F0F39-FEA2-49DF-A4F3-1A583C83C66C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0879EED-D71E-49FE-BAFA-E1D7F50C573A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0879EED-D71E-49FE-BAFA-E1D7F50C573A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0879EED-D71E-49FE-BAFA-E1D7F50C573A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0879EED-D71E-49FE-BAFA-E1D7F50C573A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D0CD40B-A9D9-4755-BEB5-6369CAACAC27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D0CD40B-A9D9-4755-BEB5-6369CAACAC27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D0CD40B-A9D9-4755-BEB5-6369CAACAC27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D0CD40B-A9D9-4755-BEB5-6369CAACAC27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AE5F914-8106-4E21-8CA3-61E3C92EDFF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AE5F914-8106-4E21-8CA3-61E3C92EDFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AE5F914-8106-4E21-8CA3-61E3C92EDFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE5F914-8106-4E21-8CA3-61E3C92EDFF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
